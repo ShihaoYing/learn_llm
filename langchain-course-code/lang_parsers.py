@@ -1,12 +1,11 @@
 import os
-from dotenv import find_dotenv, load_dotenv
+# from dotenv import find_dotenv, load_dotenv
 import openai
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 
-load_dotenv(find_dotenv())
+# load_dotenv(find_dotenv())
 openai.api_key = os.getenv("OPENAI_API_KEY")
-
 
 llm_model = "gpt-3.5-turbo"
 
@@ -48,8 +47,6 @@ cities_to_visit
 email: {email}
 """
 
-
-
 # desired_format = {
 #     "leave_time": "8:45 pm",
 #     "leave_from": "Denver, Colorado",
@@ -57,14 +54,16 @@ email: {email}
 # }
 
 prompt_template = ChatPromptTemplate.from_template(email_template)
-#print(prompt_template)
+# print("#########################")
+# print('prompt_template:')
+# print(prompt_template)
 
 messages = prompt_template.format_messages(email=email_response)
-response = chat(messages)
+response = chat.invoke(messages)
 
 # print(response.content)
 
-#==== Langchain Parsers ====
+# ==== Langchain Parsers ====
 from langchain.output_parsers import ResponseSchema
 from langchain.output_parsers import StructuredOutputParser
 
@@ -73,10 +72,10 @@ leave_time_schema = ResponseSchema(name="leave_time",
                                        It's usually a numberical time of the day. \
                                            If not available wirte n/a")
 leave_from_schema = ResponseSchema(name="leave_from",
-                                      description="Where are they leaving from.\
+                                   description="Where are they leaving from.\
                                           it's a city, airport or state, or province")
 cities_to_visit_schema = ResponseSchema(name="cities_to_visit",
-                                    description="The cities, towns they will be visiting on \
+                                        description="The cities, towns they will be visiting on \
                                         their trip. This needs to be in a list")
 
 response_schema = [
@@ -117,16 +116,10 @@ updated_prompt = ChatPromptTemplate.from_template(template=email_template_revise
 messages = prompt_template.format_messages(email=email_response,
                                            format_instructions=format_instructions)
 
-response = chat(messages)
-
+response = chat.invoke(messages)
 
 print(type(response.content))
 
-output_dict = output_parser.parse(response.content) # parse into dict
+output_dict = output_parser.parse(response.content)  # parse into dict
 print(type(output_dict))
 print(f"Cities:::: {output_dict['cities_to_visit'][0]}")
-
-
-
-
-

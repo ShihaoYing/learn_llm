@@ -1,15 +1,13 @@
 import os
-from dotenv import find_dotenv, load_dotenv
+# from dotenv import find_dotenv, load_dotenv
 import openai
-from langchain.chat_models import ChatOpenAI
+from langchain_openai.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 
-load_dotenv(find_dotenv())
+# load_dotenv(find_dotenv())
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-
-
-#==== Using OpenAI Chat API =======
+# ==== Using OpenAI Chat API =======
 llm_model = "gpt-3.5-turbo"
 chat = ChatOpenAI(temperature=0.0, model=llm_model)
 
@@ -31,9 +29,7 @@ While in Brussels we want to explore the city to its fullest - no rock left untu
 """
 email_template = """
 From the following email, extract the following information:
-
-leave_time: when are they leaving for vacation to Europe. If there's an actual
-time written, use it, if not write unknown.
+leave_time: when are they leaving for vacation to Europe. If there's an actual time written, use it, if not write unknown.
 
 leave_from: where are they leaving from, the airport or city name and state if
 available.
@@ -49,11 +45,11 @@ cities_to_visit
 email: {email}
 """
 
-
 # Imports
 from langchain.output_parsers import PydanticOutputParser
-from langchain.pydantic_v1 import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from typing import List
+
 
 # Define desired data structure
 class VacationInfo(BaseModel):
@@ -63,19 +59,20 @@ class VacationInfo(BaseModel):
     cities_to_visit: List = Field(description="The cities, towns they will be visiting on \
                                         their trip. This needs to be in a list")
     num_people: int = Field(description="this is an integer for a number of people on this trip")
-    
+
     # you can add custom validation logic...
-    @validator('num_people')
+    @field_validator('num_people')
     def check_num_people(cls, field):
-        if field <=0:
+        if field <= 0:
             raise ValueError("Badly formatted number")
         return field
-    
+
     # setup a parser and inect the instructions
+
+
 pydantic_parser = PydanticOutputParser(pydantic_object=VacationInfo)
 format_instructions = pydantic_parser.get_format_instructions()
-    
-    
+
 # reviewed email template - we updated to add the {format_instructions}
 email_template_revised = """
 From the following email, extract the following information regarding 
@@ -86,18 +83,14 @@ email: {email}
 {format_instructions}
 """
 
-
 updated_prompt = ChatPromptTemplate.from_template(template=email_template_revised)
 meassages = updated_prompt.format_messages(email=email_response,
                                            format_instructions=format_instructions)
 
-format_response = chat(meassages)
-
+format_response = chat.invoke(meassages)
 
 vacation = pydantic_parser.parse(format_response.content)
 print(type(vacation))
 # print(vacation.cities_to_visit)
 for item in vacation.cities_to_visit:
     print(f"Cities: {item}")
-    
-
