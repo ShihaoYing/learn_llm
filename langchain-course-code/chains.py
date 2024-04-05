@@ -1,12 +1,12 @@
 import os
-from dotenv import find_dotenv, load_dotenv
+# from dotenv import find_dotenvotenv, load_dotenv
 import openai
-from langchain.chat_models import ChatOpenAI
-from langchain.llms import OpenAI
+from langchain_openai import ChatOpenAI
+from langchain_openai import OpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 
-load_dotenv(find_dotenv())
+# load_dotenv(find_dotenv())
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 #==== Using OpenAI Chat API =======
@@ -23,4 +23,4 @@ prompt = PromptTemplate(
 )
 
 chain = LLMChain(llm=open_ai, prompt=prompt)
-print(chain.run(language="German"))
+print(chain.invoke(input=["German"])["text"])

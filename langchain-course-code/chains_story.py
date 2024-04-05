@@ -1,12 +1,12 @@
 import os
-from dotenv import find_dotenv, load_dotenv
+# from dotenv import find_dotenv, load_dotenv
 import openai
-from langchain.chat_models import ChatOpenAI
-from langchain.llms import OpenAI
+from langchain_openai import ChatOpenAI
+from langchain_openai.llms import OpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 
-load_dotenv(find_dotenv())
+# load_dotenv(find_dotenv())
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 #==== Using OpenAI Chat API =======
@@ -29,6 +29,6 @@ prompt = PromptTemplate(input_variables=["location", "name"],
                         template=template)
 
 chain_story = LLMChain(llm=open_ai, prompt=prompt, verbose=True)
-story = chain_story({"location": "Zanzibar", "name": "Maya"})
+story = chain_story.invoke({"location": "Zanzibar", "name": "Maya"})
 
 print(story['text'])
