@@ -7,12 +7,10 @@ from langchain_community.document_loaders import PyPDFLoader
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-#==== Using OpenAI Chat API =======
+# ==== Using OpenAI Chat API =======
 llm_model = "gpt-3.5-turbo"
 
-llm = ChatOpenAI(temperature=0.0, model=llm_model) 
-
-### pip install pypdf
+llm = ChatOpenAI(temperature=0.0, model=llm_model)
 
 loader = PyPDFLoader("./data/react-paper.pdf")
 pages = loader.load()
@@ -21,5 +19,5 @@ pages = loader.load()
 
 page = pages[0]
 # print(pages)
-print(page.page_content[0:700]) # first 700 characters on the page
+print(page.page_content)  # first 700 characters on the page
 print(page.metadata)
