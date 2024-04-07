@@ -1,7 +1,8 @@
 import os
 import openai
+from langchain import hub
 from langchain_openai.llms import OpenAI
-from langchain.agents import Tool, create_react_agent, load_tools
+from langchain.agents import  create_react_agent, load_tools, AgentExecutor
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
@@ -20,20 +21,22 @@ tools = load_tools(
         llm=llm
 )
 
+prompt = hub.pull("hwchase17/react")
+
 print(tools[0].name, tools[0].description)
 
-#TODO: change to new method
+# TODO: change to new method
 # ReAct framework = Reasoning and Action
 agent = create_react_agent(
-        agent="zero-shot-react-description",
         tools=tools,
         llm=llm,
-        verbose=True,
-        max_iterations=3  # to avoid high bills from the LLM
+        prompt=prompt
 )
+
+agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 query = "If James is currently 45 years old, how old will he be in 50 years? \
     If he has 4 kids and adopted 7 more, how many children does he have?"
-result = agent(query)
-print(result.invoke['output'])
+result = agent_executor.invoke({"input": query})
+print(result['output'])
 
 # print(f" ChatGPT ::: {llm.predict('what is 3.1^2.1')}")

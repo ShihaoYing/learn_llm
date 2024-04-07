@@ -1,5 +1,4 @@
 import os
-from dotenv import find_dotenv, load_dotenv
 import openai
 from langchain.llms import OpenAI
 from langchain.agents import Tool, initialize_agent, load_tools
@@ -8,7 +7,6 @@ from langchain import SerpAPIWrapper
 
 
 ## Must: pip install google-search-results
-load_dotenv(find_dotenv())
 openai.api_key = os.getenv("OPENAI_API_KEY")
 SERP_API_KEY = os.getenv("SERPAPI_API_KEY") # must get the api key and add to .env go to https://serpapi.com/
 
@@ -39,5 +37,3 @@ self_ask_with_search = initialize_agent(
 
 query = "who has travelled the most: Justin Timberlake, Alicia Keys, or Jason Mraz?"
 result = self_ask_with_search(query)
-
-
